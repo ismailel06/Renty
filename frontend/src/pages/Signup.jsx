@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createUser } from "../api/api";
 
-export default function Signup() {
+export default function Signup({onSignup}) {
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -17,7 +17,7 @@ export default function Signup() {
     e.preventDefault();
     const res = await createUser(form);
     alert(`User created! ID: ${res.id}`);
-    setForm({ name: "", email: "", role: "client", city: "" });
+    onSignup({ ...form, id: res.id });
   };
 
   return (

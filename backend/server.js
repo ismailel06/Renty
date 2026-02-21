@@ -84,6 +84,7 @@ app.post("/products", (req, res) => {
         category,
         city,
         condition,
+
         price_hour,
         price_day
     } = req.body;
@@ -118,4 +119,57 @@ app.get("/products", (req, res) => {
 const PORT = 4000;
 app.listen(PORT, () => {
     console.log("Server running on http://localhost:4000");
+});
+
+// Create a rental request
+app.post("/rentals", (req, res) => {
+  const { product_id, client_id, duration_hours } = req.body;
+
+  db.run(
+    `INSERT INTO rentals (product_id, client_id, duration_hours) VALUES (?, ?, ?)`,
+    [product_id, client_id, duration_hours],
+    function (err) {
+      if (err) return res.status(400).json({ error: err.message });
+
+      res.json({
+        id: this.lastID,
+        product_id,
+        client_id,
+        duration_hours,
+        status: "requested",
+        paid: 0
+      });
+    }
+  );
+});
+
+// Get rental requests for provider's products
+app.get("/rentals/:provider_id", (req, res) => {
+  const { provider_id } = req.params;
+
+  db.all(
+    `SELECT r.id, r.product_id, r.client_id, r.duration_hours, r.status, r.paid, p.name AS product_name, u.name AS client_name
+     FROM rentals r
+     JOIN products p ON r.product_id = p.id
+     JOIN users u ON r.client_id = u.id
+     WHERE p.provider_id = ?`,
+    [provider_id],
+    (err, rows) => {
+      if (err) return res.status(400).json({ error: err.message });
+      res.json(rows);
+    }
+  );
+});
+
+// Accept rental request
+app.patch("/rentals/:rental_id/accept", (req, res) => {
+  const { rental_id } = req.params;
+  db.run(
+    `UPDATE rentals SET status = 'accepted' WHERE id = ?`,
+    [rental_id],
+    function (err) {
+      if (err) return res.status(400).json({ error: err.message });
+      res.json({ success: true });
+    }
+  );
 });

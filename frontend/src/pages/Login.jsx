@@ -7,8 +7,7 @@ export default function Login({ onLogin }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Just return form to App for now
-    onLogin(form);
+    onLogin({ ...form, id: 1 });
   };
 
   return (

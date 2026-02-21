@@ -22,3 +22,27 @@ export const createProduct = async (product) => {
   });
   return await res.json();
 };
+
+// Create rental request
+export const createRental = async (rental) => {
+  const res = await fetch(`${BASE_URL}/rentals`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(rental),
+  });
+  return await res.json();
+};
+
+// Get rental requests for provider
+export const getProviderRentals = async (providerId) => {
+  const res = await fetch(`${BASE_URL}/rentals/${providerId}`);
+  return await res.json();
+};
+
+// Accept rental
+export const acceptRental = async (rentalId) => {
+  const res = await fetch(`${BASE_URL}/rentals/${rentalId}/accept`, {
+    method: "PATCH",
+  });
+  return await res.json();
+};
